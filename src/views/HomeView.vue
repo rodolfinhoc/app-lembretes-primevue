@@ -18,44 +18,69 @@
         </div>
       </div>
     </div>
+    <div class="fab-button">
+      <Button icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openModalInsertLembrete()" />
+    </div>
   </div>
+
+  <DynamicDialog/>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
-import axios from 'axios';
+import ApiService from '@/services/ApiService';
+import { useDialog } from 'primevue/usedialog';
+import InsertLembreteComponent from '@/components/dialogs/InsertLembreteComponent.vue';
 
 export default defineComponent({
   name: 'HomeView',
   components: {
     HeaderComponent,
+    InsertLembreteComponent
   },
   setup() {
     const isLoading = ref(false);
+    const isLoadingModal = ref(false);
     const searchTerm = ref("");
+    const dialog = useDialog();
     const lembretes = ref<any[]>([]);
+    const apiService = new ApiService();
 
     // Função para buscar os lembretes do usuário
     const fetchLembretes = async () => {
       isLoading.value = true;
-      const codigoUsuario = localStorage.getItem('codigoUsuario');
-      const access_token = localStorage.getItem('access_token');
+      const codigoUsuario = localStorage.getItem('codigoUsuario') ?? '';
 
-      try {
-        const response = await axios.get(`http://127.0.0.1:5000/lembretes/${codigoUsuario}`, {
-          headers: {
-            Authorization: `Bearer ${access_token}`,
-          },
-        });
-        lembretes.value = response.data.lembretes;
-      } catch (error) {
+        await apiService.getAllLembretes(codigoUsuario)
+        .then((response: any) => {
+          // Lembrete carregado com sucesso
+          if(response.data === 200){
+            lembretes.value = response.data.lembretes;
+          }
+        })
+        .catch((error: any) => {
         console.error('Erro ao obter lembretes:', error);
-      }
-
+        });
       isLoading.value = false;
     };
 
+    const openModalInsertLembrete = async () => {
+      dialog.open(InsertLembreteComponent, {
+        props: {
+          header: 'Inserir Lembrete',
+          contentClass: 'modal',
+          modal: true,
+          dismissableMask: false,
+          draggable: false,
+          // maximizable: true,
+          style: {
+            width: '70vw',
+          },
+        },
+      });
+    };
+    
     onMounted(() => {
       fetchLembretes();
     });
@@ -63,7 +88,9 @@ export default defineComponent({
     return {
       isLoading,
       lembretes,
-      searchTerm
+      searchTerm,
+      isLoadingModal,
+      openModalInsertLembrete
     };
   },
 });
@@ -117,5 +144,10 @@ export default defineComponent({
   color: #ffffff;
 }
 
+.fab-button {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+}
 
 </style>

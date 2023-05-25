@@ -17,17 +17,18 @@
 </template>
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import axios from 'axios'; // Importe a biblioteca Axios
 import { useRouter } from 'vue-router';
+
 import { useToast } from 'primevue/usetoast';
+import ApiService from '@/services/ApiService';
 
 export default defineComponent({
   setup() {
     const usuario = ref('');
     const senha = ref('');
-
     const router = useRouter();
     const toast = useToast();
+    const apiService = new ApiService();
 
     const isLoginDisabled = computed(() => {
       return !usuario.value || !senha.value;
@@ -35,11 +36,12 @@ export default defineComponent({
 
     async function login() {
       try {
-        // Faz a requisição POST para o endpoint de login da sua API
-        const response = await axios.post('http://127.0.0.1:5000/login', {
+        const loginForm = {
           usuario: usuario.value,
           senha: senha.value,
-        });
+        };
+        // Faz a requisição POST para o endpoint de login da sua API
+        const response = await apiService.postLogin(loginForm);
 
         // Verifica se a resposta da API indica sucesso
         if (response.status === 200) {
