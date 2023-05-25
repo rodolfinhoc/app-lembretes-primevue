@@ -55,7 +55,8 @@ export default defineComponent({
         await apiService.getAllLembretes(codigoUsuario)
         .then((response: any) => {
           // Lembrete carregado com sucesso
-          if(response.data === 200){
+          if(response.status === 200){
+            console.log(response.data);
             lembretes.value = response.data.lembretes;
           }
         })
