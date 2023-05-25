@@ -3,8 +3,8 @@
     <HeaderComponent />
     <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px; margin: 12px;" />
     <div class="grid p-grid" v-if="!isLoading">
-      <div v-for="lembrete in lembretes" :key="lembrete.codigo" class="sm:col-12 md:col-6 lg:col-4 xl:col-4">
-        <div class="p-card">
+      <div v-for="lembrete in lembretes" :key="lembrete.codigo" class="sm:col-12 md:col-4 lg:col-4 xl:col-4">
+        <div class="custom-card p-card">
           <div class="p-card-header">
             {{ lembrete.titulo }}
           </div>
@@ -70,21 +70,38 @@ export default defineComponent({
 </script>
 
 <style scoped lang="scss">
+@media only screen and (max-width: 600px) {
+  .sm\:col-12,
+  .md\:col-6,
+  .lg\:col-4,
+  .xl\:col-4 {
+    width: 100%;
+    margin-right: 0;
+    margin: 8px;
+  }
+}
 .grid {
   padding: 12px;
 }
 
-.p-card {
+.custom-card {
   border-radius: 10px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+  background-color: #ffffff;
+  transition: background-color 0.3s ease;
+}
+
+.custom-card:hover {
+  background-color: #f1f1f1;
 }
 
 .p-card-header {
   padding: 1rem;
   font-weight: bold;
-  background-color: #f1f1f1;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  background-color: #14B8A6;
+  color: #ffffff;
 }
 
 .p-card-body {
@@ -93,10 +110,12 @@ export default defineComponent({
 }
 
 .p-card-footer {
-  padding: 1rem;
-  background-color: #f1f1f1;
+  padding: 0px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
+  background-color: #14B8A6;
+  color: #ffffff;
 }
+
 
 </style>
