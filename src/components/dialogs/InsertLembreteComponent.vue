@@ -3,15 +3,15 @@
     <h3>{{ header }}</h3>
     <div class="p-fluid">
       <div class="p-field">
-        <label for="titulo">Título</label>
+        <label for="titulo">Título:</label>
         <InputText v-model="titulo"/>
       </div>
       <div class="p-field">
-        <label for="descricao">Descrição</label>
+        <label for="descricao">Descrição:</label>
         <Textarea v-model="descricao"/>
       </div>
       <div class="p-field">
-        <label for="data">Data</label>
+        <label for="data">Data:</label>
         <Calendar v-model="data" dateFormat="dd/mm/yy" touchUI />
       </div>
     </div>
@@ -42,8 +42,8 @@ import { computed, defineComponent, inject, ref } from 'vue';
         return !titulo.value || !descricao.value || !data.value;
       });
       
-      const closeModal = () => {
-        dialogRef.close();
+      const closeDialog = (data?: any) => {
+        dialogRef.value.close(data);
       };
 
       const salvarLembrete = async () => {
@@ -59,10 +59,9 @@ import { computed, defineComponent, inject, ref } from 'vue';
       await apiService.postLembretes(lembreteForm)
         .then((response: any) => {
           // Lembrete salvo com sucesso
-          if(response.data === 200){
-
+          if(response.status === 200){
+            closeDialog(response.data);
           }
-          // closeModal();
         })
         .catch((error: any) => {
           console.error('Erro ao salvar lembrete:', error);
@@ -89,7 +88,7 @@ import { computed, defineComponent, inject, ref } from 'vue';
         descricao,
         data,
         isSalvarDisabled,
-        closeModal,
+        closeDialog,
         salvarLembrete,
       }
     },
@@ -102,6 +101,9 @@ import { computed, defineComponent, inject, ref } from 'vue';
   }
   .p-button{
     width: 100%;
+  }
+  .p-field {
+    padding: 5px;
   }
   </style>
 

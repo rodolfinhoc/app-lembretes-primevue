@@ -19,11 +19,12 @@
       </div>
     </div>
     <div class="fab-button">
-      <Button icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openModalInsertLembrete()" />
+      <Button icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openDialogLembrete()" />
     </div>
   </div>
 
   <DynamicDialog/>
+  <Toast :position="'bottom-center'" />
 </template>
 
 <script lang="ts">
@@ -31,6 +32,7 @@ import { defineComponent, ref, onMounted } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import ApiService from '@/services/ApiService';
 import { useDialog } from 'primevue/usedialog';
+import { useToast } from 'primevue/usetoast';
 import InsertLembreteComponent from '@/components/dialogs/InsertLembreteComponent.vue';
 
 export default defineComponent({
@@ -45,6 +47,7 @@ export default defineComponent({
     const searchTerm = ref("");
     const dialog = useDialog();
     const lembretes = ref<any[]>([]);
+    const toast = useToast();
     const apiService = new ApiService();
 
     // Função para buscar os lembretes do usuário
@@ -66,7 +69,7 @@ export default defineComponent({
       isLoading.value = false;
     };
 
-    const openModalInsertLembrete = async () => {
+    const openDialogLembrete = async () => {
       dialog.open(InsertLembreteComponent, {
         props: {
           header: 'Inserir Lembrete',
@@ -78,6 +81,10 @@ export default defineComponent({
           style: {
             width: '70vw',
           },
+        },
+        onHide: () => {
+          // Lógica a ser executada quando o diálogo é fechado
+          console.log('Diálogo fechado');
         },
       });
     };
@@ -91,7 +98,7 @@ export default defineComponent({
       lembretes,
       searchTerm,
       isLoadingModal,
-      openModalInsertLembrete
+      openDialogLembrete
     };
   },
 });
