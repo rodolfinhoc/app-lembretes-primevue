@@ -1,7 +1,7 @@
 <template>
     <div class="header">
       <div class="header-left">
-        <Button @click="visibleSidebar = true" icon="pi pi-bars" class="p-button-rounded p-button-text header-menu-button"></Button>
+        <!-- <Button @click="visibleSidebar = true" icon="pi pi-bars" class="p-button-rounded p-button-text header-menu-button"></Button> -->
       </div>
       <div class="header-right">
         <Button @click="logout()" icon="pi pi-sign-out" tooltip="Sair" tooltipPosition="bottom" class="p-button-rounded p-button-text header-logout-button"></Button>

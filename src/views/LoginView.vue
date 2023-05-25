@@ -36,7 +36,7 @@ export default defineComponent({
     async function login() {
       try {
         // Faz a requisição POST para o endpoint de login da sua API
-        const response = await axios.post('https://api-python-vue.onrender.com/login', {
+        const response = await axios.post('http://127.0.0.1:5000/login', {
           usuario: usuario.value,
           senha: senha.value,
         });
