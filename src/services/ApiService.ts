@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'asdasdsad';
+const API_URL = 'https://api-python-vue.onrender.com';
 const access_token = localStorage.getItem('access_token');
 
 export default class ApiService {
