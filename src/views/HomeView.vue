@@ -2,8 +2,13 @@
   <div>
     <HeaderComponent />
     <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px; margin: 12px;" />
-    <div class="grid p-grid" v-if="!isLoading && lembretes.length > 0">
-      <div v-for="lembrete in lembretes" :key="lembrete.codigo" class="sm:col-12 md:col-4 lg:col-4 xl:col-4">
+    <div class="grid">
+        <div class="sm:col-12 md:col-12 lg:col-12 xl:col-12 w-100">
+          <InputText type="text" v-model="searchTerm" placeholder="🔍 Filtrar por título ou descrição" />
+        </div>
+      </div>
+    <div class="grid p-grid" v-if="!isLoading && filteredLembretes.length > 0">
+      <div v-for="lembrete in filteredLembretes" :key="lembrete.codigo" class="sm:col-12 md:col-4 lg:col-4 xl:col-4">
         <div class="custom-card p-card">
           <div class="p-card-header">
             <div class="card-title">
@@ -20,7 +25,7 @@
         </div>
       </div>
     </div>
-    <div v-else-if="!isLoading && lembretes.length == 0" class="no-lembretes-message">
+    <div v-else-if="!isLoading && filteredLembretes.length == 0" class="no-lembretes-message">
       <p>Nenhum lembrete cadastrado.</p>
     </div>
     <div class="fab-button">
@@ -34,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import ApiService from '@/services/ApiService';
 import { useDialog } from 'primevue/usedialog';
@@ -93,12 +98,26 @@ export default defineComponent({
       });
     };
 
+    //Função para filtrar lembretes
+    const filteredLembretes = computed(() => {
+      if (searchTerm.value.trim() === '') {
+        return lembretes.value;
+      } else {
+        const term = searchTerm.value.trim().toLowerCase();
+        return lembretes.value.filter(lembrete =>
+          lembrete.titulo.toLowerCase().includes(term) ||
+          lembrete.descricao.toLowerCase().includes(term)
+        );
+      }
+    });
+    
     // Função para buscar os lembretes do usuário
     const fetchLembretes = async () => {
       isLoading.value = true;
 
         await apiService.getAllLembretes(codigoUsuario)
         .then((response: any) => {
+          console.log(response);
           // Lembrete carregado com sucesso
           if(response.status === 200){
             lembretes.value = response.data.lembretes;
@@ -137,6 +156,7 @@ export default defineComponent({
       searchTerm,
       isLoadingModal,
       openDialogLembrete,
+      filteredLembretes,
       excluirLembrete,
       confirmarExcluir
     };
@@ -157,6 +177,10 @@ export default defineComponent({
 }
 .grid {
   padding: 12px;
+}
+
+.p-inputtext {
+  width: 100%;
 }
 
 .custom-card {
