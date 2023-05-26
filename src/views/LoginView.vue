@@ -11,8 +11,9 @@
         </div>
         <Button type="submit" class="login-button p-button p-mt-2" :disabled="isLoginDisabled">LOGIN</Button>
       </div>
+      <ProgressBar v-if="isLoading" mode="indeterminate" class="progressBar"/>
     </form>
-  </div>
+  </div>  
   <Toast :position="'top-right'" />
 </template>
 
@@ -25,6 +26,7 @@ import ApiService from '@/services/ApiService';
 
 export default defineComponent({
   setup() {
+    const isLoading = ref(false);
     const usuario = ref('');
     const senha = ref('');
     const router = useRouter();
@@ -36,6 +38,7 @@ export default defineComponent({
     });
 
     async function login() {
+      isLoading.value = true;
       try {
         const loginForm = {
           usuario: usuario.value,
@@ -60,12 +63,14 @@ export default defineComponent({
         console.error(error);
         toast.add({ severity: 'error', summary: 'Erro!', detail: 'Ocorreu um erro durante o login', life: 3000 });
       }
+      isLoading.value = false;
     }
 
     return {
       usuario,
       senha,
       isLoginDisabled,
+      isLoading,
       login,
     };
   },
@@ -84,6 +89,12 @@ export default defineComponent({
   overflow: hidden;
   background-color: #eef2ff;
 
+  .progressBar {
+    height: 6px;
+    margin: 8px;
+    width: 100%;
+    margin-left: 0px;
+  }
   .img-login {
     display: block;
     margin-left: auto;
