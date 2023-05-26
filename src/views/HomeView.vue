@@ -2,7 +2,7 @@
   <div>
     <HeaderComponent />
     <ProgressBar v-if="isLoading" mode="indeterminate" style="height: 6px; margin: 12px;" />
-    <div class="grid p-grid" v-if="!isLoading">
+    <div class="grid p-grid" v-if="!isLoading && lembretes.length > 0">
       <div v-for="lembrete in lembretes" :key="lembrete.codigo" class="sm:col-12 md:col-4 lg:col-4 xl:col-4">
         <div class="custom-card p-card">
           <div class="p-card-header">
@@ -20,6 +20,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div v-else-if="!isLoading && lembretes.length == 0" class="no-lembretes-message">
+      <p>Nenhum lembrete cadastrado.</p>
     </div>
     <div class="fab-button">
       <Button icon="pi pi-plus" class="p-button-rounded p-button-primary" @click="openDialogLembrete()" />
@@ -61,11 +64,10 @@ export default defineComponent({
       dialog.open(InsertLembreteComponent, {
         props: {
           header: 'Inserir Lembrete',
-          contentClass: 'modal',
           modal: true,
           dismissableMask: false,
           draggable: false,
-          // maximizable: true,
+          maximizable: true,
           style: {
             width: '70vw',
           },
@@ -100,12 +102,11 @@ export default defineComponent({
         .then((response: any) => {
           // Lembrete carregado com sucesso
           if(response.status === 200){
-            console.log(response.data);
             lembretes.value = response.data.lembretes;
           }
         })
         .catch((error: any) => {
-        console.error('Erro ao obter lembretes:', error);
+          toast.add({ severity: 'error', summary: 'Erro!', detail: 'Erro ao obter lembretes:' + error, life: 3000 });
         });
       isLoading.value = false;
     };
@@ -121,7 +122,7 @@ export default defineComponent({
           }
         })
         .catch((error: any) => {
-          console.error('Erro ao obter lembretes:', error);
+          toast.add({ severity: 'error', summary: 'Erro!', detail: 'Erro ao excluir lembretes:' + error, life: 3000 });
         });
 
       isLoadingModal.value = false;
