@@ -6,7 +6,10 @@
       <div v-for="lembrete in lembretes" :key="lembrete.codigo" class="sm:col-12 md:col-4 lg:col-4 xl:col-4">
         <div class="custom-card p-card">
           <div class="p-card-header">
-            {{ lembrete.titulo }}
+            <div class="card-title">
+              {{ lembrete.titulo }}
+            </div>
+            <Button icon="pi pi-trash" class="p-button-icon-only" @click="confirmarExcluir(lembrete.codigo)" />
           </div>
           <div class="p-card-body">
             <p>{{ lembrete.descricao }}</p>
@@ -23,7 +26,8 @@
     </div>
   </div>
 
-  <DynamicDialog/>
+  <DynamicDialog />
+  <ConfirmDialog />
   <Toast :position="'bottom-center'" />
 </template>
 
@@ -32,8 +36,9 @@ import { defineComponent, ref, onMounted } from 'vue';
 import HeaderComponent from '@/components/HeaderComponent.vue';
 import ApiService from '@/services/ApiService';
 import { useDialog } from 'primevue/usedialog';
-import { useToast } from 'primevue/usetoast';
 import InsertLembreteComponent from '@/components/dialogs/InsertLembreteComponent.vue';
+import { useToast } from 'primevue/usetoast';
+import { useConfirm } from "primevue/useconfirm";
 
 export default defineComponent({
   name: 'HomeView',
@@ -46,14 +51,50 @@ export default defineComponent({
     const isLoadingModal = ref(false);
     const searchTerm = ref("");
     const dialog = useDialog();
-    const lembretes = ref<any[]>([]);
     const toast = useToast();
+    const confirm = useConfirm();
+    const lembretes = ref<any[]>([]);
+    const codigoUsuario = localStorage.getItem('codigoUsuario') ?? '';
     const apiService = new ApiService();
+
+    const openDialogLembrete = async () => {
+      dialog.open(InsertLembreteComponent, {
+        props: {
+          header: 'Inserir Lembrete',
+          contentClass: 'modal',
+          modal: true,
+          dismissableMask: false,
+          draggable: false,
+          // maximizable: true,
+          style: {
+            width: '70vw',
+          },
+        },
+        onClose(options: any) {
+          if(options.data === 200) {
+            toast.add({ severity: 'success', summary: 'Sucesso!', detail: 'Lembrete inserido com sucesso', life: 3000 });
+            fetchLembretes();
+          }
+        }
+      });
+    };
+
+    const confirmarExcluir = async (codigoLembrete: number) => {
+      confirm.require({
+          message: 'Deseja excluir o lembrete?',
+          header: 'Confirmar Exclusão',
+          icon: 'pi pi-exclamation-triangle',
+          accept: () => {
+            excluirLembrete(codigoLembrete)
+          },
+          reject: () => {
+          }
+      });
+    };
 
     // Função para buscar os lembretes do usuário
     const fetchLembretes = async () => {
       isLoading.value = true;
-      const codigoUsuario = localStorage.getItem('codigoUsuario') ?? '';
 
         await apiService.getAllLembretes(codigoUsuario)
         .then((response: any) => {
@@ -69,26 +110,23 @@ export default defineComponent({
       isLoading.value = false;
     };
 
-    const openDialogLembrete = async () => {
-      dialog.open(InsertLembreteComponent, {
-        props: {
-          header: 'Inserir Lembrete',
-          contentClass: 'modal',
-          modal: true,
-          dismissableMask: false,
-          draggable: false,
-          // maximizable: true,
-          style: {
-            width: '70vw',
-          },
-        },
-        onHide: () => {
-          // Lógica a ser executada quando o diálogo é fechado
-          console.log('Diálogo fechado');
-        },
-      });
+    const excluirLembrete = async (codigoLembrete: number) => {
+      isLoadingModal.value = true;
+      await apiService.deleteLembretes(codigoUsuario, codigoLembrete)
+        .then((response: any) => {
+          // Lembrete excluído com sucesso
+          if (response.status === 200) {
+            toast.add({ severity: 'success', summary: 'Sucesso!', detail: response.data.message, life: 3000 });
+            fetchLembretes();
+          }
+        })
+        .catch((error: any) => {
+          console.error('Erro ao obter lembretes:', error);
+        });
+
+      isLoadingModal.value = false;
     };
-    
+
     onMounted(() => {
       fetchLembretes();
     });
@@ -98,7 +136,9 @@ export default defineComponent({
       lembretes,
       searchTerm,
       isLoadingModal,
-      openDialogLembrete
+      openDialogLembrete,
+      excluirLembrete,
+      confirmarExcluir
     };
   },
 });
@@ -131,12 +171,19 @@ export default defineComponent({
 }
 
 .p-card-header {
-  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-weight: bold;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
-  background-color: #14B8A6;
+  background-color: #14b8a6;
   color: #ffffff;
+}
+
+.card-title {
+  flex: auto;
+  margin-left: 48px;
 }
 
 .p-card-body {
@@ -148,8 +195,8 @@ export default defineComponent({
   padding: 0px;
   border-bottom-left-radius: 10px;
   border-bottom-right-radius: 10px;
-  background-color: #14B8A6;
-  color: #ffffff;
+  background-color: #e2e2e2;
+  color: #495057;
 }
 
 .fab-button {
@@ -157,5 +204,4 @@ export default defineComponent({
   bottom: 24px;
   right: 24px;
 }
-
 </style>

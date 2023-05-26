@@ -15,6 +15,7 @@
   </div>
   <Toast :position="'top-right'" />
 </template>
+
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import { useRouter } from 'vue-router';
@@ -120,7 +121,7 @@ export default defineComponent({
       font-size: 1.2rem;
       margin-top: 1rem;
       justify-content: center;
-      background-color: #4285F4;
+      background-color: #4285f4;
     }
 
     .p-field {
