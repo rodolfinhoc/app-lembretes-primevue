@@ -13,10 +13,9 @@
           </div>
           <div class="p-card-body">
             <p>{{ lembrete.descricao }}</p>
-            <p>Data: {{ lembrete.data }}</p>
           </div>
           <div class="p-card-footer">
-            <p>Criado em: {{ lembrete.criadoEm }}</p>
+            <p>Data: {{ lembrete.data }}</p>
           </div>
         </div>
       </div>
